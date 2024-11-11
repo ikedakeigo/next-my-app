@@ -2,23 +2,32 @@
 import { useEffect, useState } from "react";
 // import styles from "./PostList.module.css";
 import Link from "next/link";
-import { Post } from "./_types/Post";
+// import { Post } from "./_types/Post";
+import { MicroCmsPost } from "./pp/_types/MicroCmsPost";
 
 
 
 const PostList = () => {
 
-  const [postsList, setPostsList] = useState<Post[]>([])
+  const [postsList, setPostsList] = useState<MicroCmsPost[]>([])
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts");
-      const data = await res.json();
-      setPostsList(data.posts)
+      const res = await fetch("https://840vmtpwl1.microcms.io/api/v1/posts", { // 記事のエンドポイント
+        headers: {
+          "X-MICROCMS-API-KEY": "bph1RS3bmZ37K4rnwICqsW1vdLMfAQWJ5BRL", // APIキーの設定
+        }
+      });
+
+      const {contents} = await res.json();
+      console.log("contents--->", contents)
+      setPostsList(contents)
     }
 
     fetcher()
   }, [])
+
+  console.log("postsList--->", postsList)
 
   return (
     <ul>
@@ -33,7 +42,7 @@ const PostList = () => {
                   <div className="">
                     {post.categories.map((category, index) => (
                       <span className="" key={index}>
-                        {category}
+                        {category.name}
                       </span>
                     ))}
                   </div>
