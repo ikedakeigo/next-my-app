@@ -1,18 +1,18 @@
-"use client";
-// import { Post } from "@/app/_types/Post";
+"use client"
+
 import { MicroCmsPost } from "@/app/pp/_types/MicroCmsPost";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 type Props = {
   params: {
-    id: string;
-  };
-};
+    id: string
+  }
+}
 /**
  * ルートパラメータよりidを取得 params
  */
-const PostDetail: React.FC<Props> = ({ params }) => {
+const PostDetail: React.FC<Props> = ({params}) => {
   // const { id } = useParams<{id: string}>(); // useParamsでurlよりidを取得
   // const postId = Number(id) // Number関数で数値に変換
   const [post, setPost] = useState<MicroCmsPost | null>(null);
@@ -23,12 +23,11 @@ const PostDetail: React.FC<Props> = ({ params }) => {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch(`https://840vmtpwl1.microcms.io/api/v1/posts/${params.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_MICROCMS_API_URL}/${params.id}`, {
           headers: {
-            "X-MICROCMS-API-KEY": "bph1RS3bmZ37K4rnwICqsW1vdLMfAQWJ5BRL",
+            "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_MICROCMS_API_KEY as string
           },
         });
-
         const post = await res.json();
         console.log("contents---->", post);
         setPost(post);
@@ -51,16 +50,17 @@ const PostDetail: React.FC<Props> = ({ params }) => {
   }
 
   console.log("post--->", post);
+
   const { title, createdAt, categories, thumbnail, content } = post;
   return (
     <div className="">
       <div className="">
         <div className="">
           <Image
-            width={thumbnail.width}
-            height={thumbnail.height}
-            src={thumbnail.url}
-            alt={title}
+          width={thumbnail.width}
+          height={thumbnail.height}
+          src={thumbnail.url}
+          alt={title}
           />
         </div>
         <div className="">

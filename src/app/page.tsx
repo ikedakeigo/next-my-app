@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 // import styles from "./PostList.module.css";
 import Link from "next/link";
-// import { Post } from "./_types/Post";
+
 import { MicroCmsPost } from "./pp/_types/MicroCmsPost";
 
 
@@ -13,12 +13,11 @@ const PostList = () => {
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch("https://840vmtpwl1.microcms.io/api/v1/posts", { // 記事のエンドポイント
+      const res = await fetch(process.env.NEXT_PUBLIC_MICROCMS_API_URL as string, { // 記事のエンドポイント
         headers: {
-          "X-MICROCMS-API-KEY": "bph1RS3bmZ37K4rnwICqsW1vdLMfAQWJ5BRL", // APIキーの設定
+          "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_MICROCMS_API_KEY as string, // APIキーの設定
         }
       });
-
       const {contents} = await res.json();
       console.log("contents--->", contents)
       setPostsList(contents)
