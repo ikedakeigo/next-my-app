@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 // import styles from "./PostList.module.css";
 import Link from "next/link";
-import { Posts } from "./_types/Post";
+import { Post } from "./_types/Post";
 
 
 
 const PostList = () => {
 
-  const [postsList, setPostsList] = useState<Posts[]>([])
+  const [postsList, setPostsList] = useState<Post[]>([])
 
   useEffect(() => {
     const fetcher = async () => {

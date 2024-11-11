@@ -1,5 +1,5 @@
 "use client"
-import { Posts } from "@/app/_types/Post";
+import { Post } from "@/app/_types/Post";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
@@ -15,7 +15,7 @@ type Props = {
 const PostDetail: React.FC<Props> = ({params}) => {
   // const { id } = useParams<{id: string}>(); // useParamsでurlよりidを取得
   // const postId = Number(id) // Number関数で数値に変換
-  const [post, setPost] = useState<Posts | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
 
   //記事詳細ページの取得
@@ -35,7 +35,7 @@ const PostDetail: React.FC<Props> = ({params}) => {
 
     fetcher();
 
-  }, []); 
+  }, []);
 
   if (loading) {
     return <p>Loading...</p>;
