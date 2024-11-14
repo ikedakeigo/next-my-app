@@ -1,24 +1,30 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 // import styles from "./PostList.module.css";
 import Link from "next/link";
-import { Post } from "./_types/Post";
 
-
+import { MicroCmsPost } from "./pp/_types/MicroCmsPost";
 
 const PostList = () => {
-
-  const [postsList, setPostsList] = useState<Post[]>([])
+  const [postsList, setPostsList] = useState<MicroCmsPost[]>([]);
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts");
+      const res = await fetch(process.env.NEXT_PUBLIC_MICROCMS_API_URL as string, {
+        // 記事のエンドポイント
+        headers: {
+          "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_MICROCMS_API_KEY as string, // APIキーの設定
+        },
+      });
       const data = await res.json();
-      setPostsList(data.posts)
-    }
+      console.log("data--->", data.contents);
+      setPostsList(data.contents);
+    };
 
-    fetcher()
-  }, [])
+    fetcher();
+  }, []);
+
+  console.log("postsList--->", postsList);
 
   return (
     <ul>
@@ -33,7 +39,7 @@ const PostList = () => {
                   <div className="">
                     {post.categories.map((category, index) => (
                       <span className="" key={index}>
-                        {category}
+                        {category.name}
                       </span>
                     ))}
                   </div>
