@@ -7,6 +7,10 @@ export const GET = async (request: NextRequest) => {
   try {
     // カテゴリーの一覧をDBから取得
     const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
       orderBy: {
         createdAt: "desc", // 作成日時の降順で取得
       },
