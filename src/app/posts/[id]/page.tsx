@@ -53,7 +53,7 @@ const PostDetail: React.FC<Props> = ({params}) => {
 
   const { title, createdAt, categories, thumbnail, content } = post;
   return (
-    <div className="">
+    <div className="max-w-3xl m-auto pt-14">
       <div className="">
         <div className="">
           <Image
@@ -63,18 +63,18 @@ const PostDetail: React.FC<Props> = ({params}) => {
           alt={title}
           />
         </div>
-        <div className="">
-          <div className="">
-            <div className="">{new Date(createdAt).toLocaleDateString()}</div>
-            <div className="">
+        <div className="p-4">
+        <div className="flex justify-between">
+            <div className="text-sm text-gray-400">{new Date(createdAt).toLocaleDateString()}</div>
+            <div className="flex gap-2">
               {categories.map((category, index) => (
-                <span className="" key={index}>
+                <span className="px-2 py-1 text-xs text-blue-600 border border-solid border-blue-600 rounded" key={index}>
                   {category.name}
                 </span>
               ))}
             </div>
           </div>
-          <div className="">{title}</div>
+          <div className="text-2xl py-4">{title}</div>
           <div className="" dangerouslySetInnerHTML={{ __html: content }} />
         </div>
       </div>
