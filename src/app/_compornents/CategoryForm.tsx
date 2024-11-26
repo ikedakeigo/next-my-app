@@ -2,22 +2,32 @@
 
 import { useRouter } from "next/navigation";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { RequestCategoryBody } from "../_types/RequestCategoryBody";
 
 type CategoryFormProps = {
   handleDelete?: () => void;
-  category?: any;
+  category?: RequestCategoryBody;
   isEdit?: boolean;
+};
+
+type FormValues = {
+  name: string;
 };
 
 const CategoryForm: React.FC<CategoryFormProps> = ({ handleDelete, category, isEdit }) => {
   console.log("category--------->", category);
   console.log("isEdit--------->", isEdit);
 
-  const { register, handleSubmit } = useForm();
+  // formの登録
+  const { register, handleSubmit } = useForm<FormValues>();
+
   const router = useRouter();
 
-  const onsubmit = async (data: any) => {
+  // formで送信されたデータ(data)を取得
+  // SubmitHandler<FormValues>は、formのデータを受け取る型
+  // onsubmit に渡されるデータが FormValues に一致することを保証
+  const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const updateData = {
       ...data,
       category,
