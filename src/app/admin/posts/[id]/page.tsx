@@ -27,7 +27,7 @@ const EditPost = ({ params }:any) => {
       }
     };
     fetchPost();
-  }, []);
+  }, [id]);
 
   // 記事の削除
   const handleDelete = async () => {
