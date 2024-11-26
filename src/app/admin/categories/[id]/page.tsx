@@ -4,7 +4,17 @@ import CategoryForm from '@/app/_compornents/CategoryForm';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
-const EditCategory = ({params}: any) => {
+// パラメーターの型定義
+type Params = {
+  id: number;
+}
+
+// プロパティの型定義
+type EditCategoryProps = {
+  params: Params;
+};
+
+const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
   const {id} = params;
   const router = useRouter();
   const [category, setCategory] = useState();

@@ -5,7 +5,15 @@ import { PostListBody } from "@/app/_types/PostListBody";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const EditPost = ({ params }:any) => {
+type Params = {
+  id: number;
+}
+
+type EditPostProps = {
+  params: Params;
+}
+
+const EditPost: React.FC<EditPostProps> = ({ params }) => {
   const { id } = params;
   const router = useRouter();
   const [post, setPost] = useState<PostListBody>();
