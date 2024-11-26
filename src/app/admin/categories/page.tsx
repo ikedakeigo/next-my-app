@@ -1,9 +1,10 @@
 "use client";
+import { RequestCategoryBody } from "@/app/_types/RequestCategoryBody";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const CategoryList = () => {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<RequestCategoryBody[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
