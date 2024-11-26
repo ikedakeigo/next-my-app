@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { RequestPostBody } from "../_types/RequestPostBody";
 import { RequestCategoryBody } from "../_types/RequestCategoryBody";
 
@@ -11,11 +11,17 @@ type PostFormProps = {
   isEdit?: boolean;
 };
 
+type FormValues = {
+  title: string;
+  content: string;
+  thumbnailUrl: string;
+};
+
 const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
   const {
     register, // 入力フィールドを登録する
     handleSubmit, // フォーム送信時の処理を定義する
-  } = useForm();
+  } = useForm<FormValues>();
 
   console.log("post^------->", post);
 
@@ -50,12 +56,15 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
     fetchCategory();
   }, [post]);
 
-  const handleChange = (edit: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (
+    edit: React.ChangeEvent<HTMLSelectElement>
+    ) => {
     const {
-      target: { value },
+      target: { value }
     } = edit;
 
-    const selectedCategoryNames = typeof value === "string" ? value.split(",") : value;
+    const selectedCategoryNames =
+    typeof value === "string" ? value.split(",") : value;
     setCategoryName(selectedCategoryNames);
 
     // 選択されたカテゴリー名に基づいて、selectCategoryを更新
@@ -66,7 +75,7 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
   };
 
   // 記事投稿
-  const onsubmit = async (data: any) => {
+  const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const updateData = {
       ...data,
       categories: selectCategories,
@@ -86,7 +95,7 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
       alert(isEdit ? "記事の更新に失敗しました" : "");
     }
   };
-  
+
   return (
     <div className="p-10 w-full">
       <h2 className="text-xl font-bold mb-6">{isEdit ? "記事編集" : "記事作成"}</h2>
