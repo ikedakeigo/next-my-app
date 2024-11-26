@@ -44,7 +44,7 @@ interface CreatePostRequestBody {
   name: string;
 }
 
-export const POST = async (request: Request, context: any) => {
+export const POST = async (request: Request) => {
   try {
     // リクエストのbodyを取得
     const body = await request.json();
