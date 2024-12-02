@@ -23,23 +23,23 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
     handleSubmit, // フォーム送信時の処理を定義する
   } = useForm<FormValues>();
 
-  console.log("post^------->", post);
-
   const router = useRouter();
 
+  // カテゴリーの初期値
   const [categories, setCategories] = useState<RequestCategoryBody[]>([]);
+
+  // 選択されたカテゴリー
   const [categoryName, setCategoryName] = useState<string[]>([]);
+
+  // 選択されたカテゴリーのオブジェクト
   const [selectCategories, setSelectCategories] = useState<RequestCategoryBody[]>([]);
 
-  console.log("categories------->", categories);
   useEffect(() => {
     const fetchCategory = async () => {
       // 全カテゴリーを取得
       const allCategories = await fetch("/api/admin/categories");
-      console.log("allCategories--------->", allCategories);
 
       const categoryData = await allCategories.json();
-      console.log("categoryData--------->", categoryData);
 
       setCategories(categoryData.categories);
 
@@ -56,21 +56,35 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
     fetchCategory();
   }, [post]);
 
-  const handleChange = (
-    edit: React.ChangeEvent<HTMLSelectElement>
-    ) => {
+  const handleChange = (edit: React.ChangeEvent<HTMLSelectElement>) => {
     const {
-      target: { value }
+      target: { value },
     } = edit;
 
-    const selectedCategoryNames =
-    typeof value === "string" ? value.split(",") : value;
+    // 選択されたカテゴリー名を更新
+    const selectedCategoryNames = typeof value === "string" ? value.split(",") : value;
     setCategoryName(selectedCategoryNames);
 
     // 選択されたカテゴリー名に基づいて、selectCategoryを更新
-    const updatedSelectedCategories = categories.filter((category) => {
-      selectedCategoryNames.includes(category.name);
-    });
+    // filterメソッドを使用して、選択されたカテゴリー名に一致するカテゴリーを取得
+    /**
+     * filterメソッドの書き方
+     * - ブラケット `{}` を使用する場合、`return` を明示的に記述する必要がある。
+     * - 簡潔に書く場合、括弧 `()` を使用することで暗黙的に値を返せる。
+     *
+     * 例:
+     * const updatedSelectedCategories = categories.filter((c) => (
+     *   selectedCategoryNames.includes(c.name)
+     * ));
+     */
+    // return が必要な場合
+    // const updatedSelectedCategories = categories.filter((c) => {
+    //  return selectedCategoryNames.includes(c.name);
+    // });
+    // 省略記法 以下
+    const updatedSelectedCategories = categories.filter((c) => selectedCategoryNames.includes(c.name));
+
+    console.log("updatedSelectedCategories------->", updatedSelectedCategories);
     setSelectCategories(updatedSelectedCategories);
   };
 
@@ -80,6 +94,8 @@ const PostForm = ({ handleDelete, post, isEdit }: PostFormProps) => {
       ...data,
       categories: selectCategories,
     };
+
+    console.log("updateData------->", updateData);
 
     try {
       const res = await fetch(`/api/admin/posts/${isEdit ? `${post?.id}` : ""}`, {
