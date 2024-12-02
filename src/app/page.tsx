@@ -3,29 +3,23 @@ import { useEffect, useState } from "react";
 // import styles from "./PostList.module.css";
 import Link from "next/link";
 
-import { MicroCmsPost } from "./pp/_types/MicroCmsPost";
+// import { MicroCmsPost } from "./pp/_types/MicroCmsPost";
+import { PostListBody } from "./_types/PostListBody";
 
 const PostList = () => {
-  const [postsList, setPostsList] = useState<MicroCmsPost[]>([]);
+  const [postsList, setPostsList] = useState<PostListBody[]>([]);
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch(process.env.NEXT_PUBLIC_MICROCMS_API_URL as string, {
-        // 記事のエンドポイント
-        headers: {
-          "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_MICROCMS_API_KEY as string, // APIキーの設定
-        },
-      });
+      const res = await fetch("/api/posts");
       const data = await res.json();
-      console.log("data--->", data.contents);
-      setPostsList(data.contents);
+      setPostsList(data.posts);
     };
 
     fetcher();
   }, []);
 
-  console.log("postsList--->", postsList);
-
+  console.log("postsList--->", postsList)
   return (
     <ul className="flex flex-col gap-8">
       {postsList.map((post) => (
@@ -37,9 +31,9 @@ const PostList = () => {
                 <div className="">
                   <div className="text-sm text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</div>
                   <div className="flex gap-2">
-                    {post.categories.map((category, index) => (
+                    {post.postCategories.map((postCategories, index) => (
                       <span className="px-2 py-1 text-xs text-blue-600 border border-solid border-blue-600 rounded" key={index}>
-                        {category.name}
+                        {postCategories.category.name}
                       </span>
                     ))}
                   </div>
