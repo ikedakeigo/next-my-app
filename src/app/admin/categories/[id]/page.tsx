@@ -54,12 +54,30 @@ const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
     }
   }
 
+  // カテゴリーの更新
+  const handleUpdate = async (updateData) => {
+    try {
+      const res = await fetch(`/api/admin/categories/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+      if(res.ok) {
+        router.push("/admin/categories");
+        alert("カテゴリーの更新ができました。")
+      }
+    } catch (error) {
+      console.log("データの取得エラー：", error)
+      alert("カテゴリーの更新ができませんでした")
+    }
+  }
+
   if(loading) {
     return <div>Loading...</div>
   }
   return (
     <CategoryForm
       handleDelete={handleDelete}
+      onUpdate={handleUpdate}
       category={category}
       isEdit={true}
     />
