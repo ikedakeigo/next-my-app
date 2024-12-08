@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { RequestCategoryBody } from "../_types/RequestCategoryBody";
 
 type CategoryFormProps = {
   handleDelete?: () => void;
+  onCreate?: (data: UpdateData) => void;
+  onUpdate?: (data: UpdateData) => void;
   category?: RequestCategoryBody;
   isEdit?: boolean;
 };
@@ -15,14 +16,16 @@ type FormValues = {
   name: string;
 };
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ handleDelete, category, isEdit }) => {
+type UpdateData = FormValues & {
+  category?: { name: string };
+};
+
+const CategoryForm: React.FC<CategoryFormProps> = ({ handleDelete, onUpdate, onCreate, category, isEdit }) => {
   console.log("category--------->", category);
   console.log("isEdit--------->", isEdit);
 
   // formの登録
   const { register, handleSubmit } = useForm<FormValues>();
-
-  const router = useRouter();
 
   // formで送信されたデータ(data)を取得
   // SubmitHandler<FormValues>は、formのデータを受け取る型
@@ -33,21 +36,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ handleDelete, category, isE
       category,
     };
 
-    console.log("updateData--------->", updateData);
+    // category?.id ? onUpdate?.(updateData) : onCreate?.(updateData);
 
-    try {
-      const res = await fetch(`/api/admin/categories/${isEdit ? `${category?.id}` : ""}`, {
-        method: isEdit ? "PUT" : "POST",
-        body: JSON.stringify(updateData),
-      });
-      if (res.ok) {
-        router.push("/admin/categories");
-        alert(isEdit ? "カテゴリーの更新ができました" : "カテゴリーの作成ができました");
-      }
-    } catch (error) {
-      console.log("データ取得エラー:", error);
-      alert(isEdit ? "カテゴリーの更新ができませんでした" : "");
+    /**
+     * 三項演算子は「結果が使用されない」とエラーになる* ため、
+     * 関数呼び出しのような副作用を伴う処理では
+     * `if` 文を使用する。
+     * オプショナルチェーン (?.) を使用して、関数が存 * 在しない場合でも安全に処理をスキップする。
+     */
+    if (category?.id) {
+      onUpdate?.(updateData);
+    } else {
+      onCreate?.(updateData);
     }
+
   };
 
   return (
