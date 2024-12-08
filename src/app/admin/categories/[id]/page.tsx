@@ -1,6 +1,7 @@
 "use client";
 
 import CategoryForm from '@/app/_compornents/CategoryForm';
+import { CategoryUpdateData } from '@/app/_types/CategoryUpdateData';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
@@ -12,11 +13,6 @@ type Params = {
 // プロパティの型定義
 type EditCategoryProps = {
   params: Params;
-};
-
-type UpdateData = {
-  name: string;
-  category?: { name: string };
 };
 
 const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
@@ -60,7 +56,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
   }
 
   // カテゴリーの更新
-  const handleUpdate = async (updateData: UpdateData) => {
+  const handleUpdate = async (updateData: CategoryUpdateData) => {
     try {
       const res = await fetch(`/api/admin/categories/${id}`, {
         method: "PUT",

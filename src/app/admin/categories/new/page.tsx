@@ -1,17 +1,13 @@
 "use client";
 import CategoryForm from "@/app/_compornents/CategoryForm";
+import { CategoryUpdateData } from "@/app/_types/CategoryUpdateData";
 import { useRouter } from "next/navigation";
 import React from "react";
-
-type UpdateData = {
-  name: string;
-  category?: { name: string };
-};
 
 const NewCategory = () => {
   const router = useRouter();
 
-  const handleCreate = async (updateData: UpdateData) => {
+  const handleCreate = async (updateData: CategoryUpdateData) => {
     try {
       const res = await fetch("/api/admin/categories", {
         method: "POST",

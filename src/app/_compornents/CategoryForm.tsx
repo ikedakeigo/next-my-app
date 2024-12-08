@@ -3,21 +3,18 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { RequestCategoryBody } from "../_types/RequestCategoryBody";
+import { CategoryUpdateData } from "../_types/CategoryUpdateData";
 
 type CategoryFormProps = {
   handleDelete?: () => void;
-  onCreate?: (data: UpdateData) => void;
-  onUpdate?: (data: UpdateData) => void;
+  onCreate?: (data: CategoryUpdateData) => void;
+  onUpdate?: (data: CategoryUpdateData) => void;
   category?: RequestCategoryBody;
   isEdit?: boolean;
 };
 
 type FormValues = {
   name: string;
-};
-
-type UpdateData = FormValues & {
-  category?: { name: string };
 };
 
 const CategoryForm: React.FC<CategoryFormProps> = ({ handleDelete, onUpdate, onCreate, category, isEdit }) => {
