@@ -1,29 +1,34 @@
 "use client";
-import CategoryForm from '@/app/_compornents/CategoryForm';
-import { useRouter } from 'next/navigation';
-import React from 'react'
+import CategoryForm from "@/app/_compornents/CategoryForm";
+import { useRouter } from "next/navigation";
+import React from "react";
+
+type UpdateData = {
+  name: string;
+  category?: { name: string };
+};
 
 const NewCategory = () => {
   const router = useRouter();
 
-  const handleCreate = async(updateData) => {
+  const handleCreate = async (updateData: UpdateData) => {
     try {
-      const res = await fetch("/api/admin/categories",{
+      const res = await fetch("/api/admin/categories", {
         method: "POST",
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
-      if(res.ok) {
+      if (res.ok) {
         router.push("/admin/categories");
-        alert("カテゴリーの作成ができました")
+        alert("カテゴリーの作成ができました");
       }
     } catch (error) {
       console.log("データ取得エラー：", error);
-      alert("カテゴリーの作成ができませんでした")
+      alert("カテゴリーの作成ができませんでした");
     }
-  }
+  };
 
   // 編集画面の場合はisEditをtrueにする
-  return <CategoryForm isEdit={false} onCreate={handleCreate}/>
-}
+  return <CategoryForm isEdit={false} onCreate={handleCreate} />;
+};
 
-export default NewCategory
+export default NewCategory;
