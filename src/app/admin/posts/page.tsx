@@ -14,8 +14,8 @@ const PostList = () => {
 
       try {
         // 記事一覧apiを取得
-        // const res = await fetch("/api/admin/posts");
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/posts`);
+        const res = await fetch("/api/admin/posts");
+        // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/posts`);
         const data = await res.json();
         setPosts(data.posts);
       } catch (error) {
