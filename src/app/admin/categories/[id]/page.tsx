@@ -14,6 +14,11 @@ type EditCategoryProps = {
   params: Params;
 };
 
+type UpdateData = {
+  name: string;
+  category?: { name: string };
+};
+
 const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
   const {id} = params;
   const router = useRouter();
@@ -55,7 +60,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({params}) => {
   }
 
   // カテゴリーの更新
-  const handleUpdate = async (updateData) => {
+  const handleUpdate = async (updateData: UpdateData) => {
     try {
       const res = await fetch(`/api/admin/categories/${id}`, {
         method: "PUT",
