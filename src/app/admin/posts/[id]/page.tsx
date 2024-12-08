@@ -2,6 +2,7 @@
 
 import PostForm from "@/app/_compornents/PostForm";
 import { PostListBody } from "@/app/_types/PostListBody";
+import { PostUpdateData } from "@/app/_types/PostUpdateData";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -25,7 +26,6 @@ const EditPost: React.FC<EditPostProps> = ({ params }) => {
       setLoading(true);
       try {
         const res = await fetch(`/api/admin/posts/${id}`);
-        console.log("res--------->", res)
         const data = await res.json();
         setPost(data.post);
       } catch (error) {
@@ -57,14 +57,32 @@ const EditPost: React.FC<EditPostProps> = ({ params }) => {
     }
   };
 
+  // 記事の更新
+  const handleUpdate = async (updateData: PostUpdateData) => {
+    console.log("更新", updateData)
+    try {
+      const res = await fetch(`/api/admin/posts/${id}`,{
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+      if(res.ok) {
+        router.push("/admin/posts");
+        alert("記事の更新ができました")
+      }
+    } catch (error) {
+      console.log("データの取得エラー：", error)
+      alert("記事の更新ができませんでした")
+    }
+  }
+
   if (loading) {
     return <div>Loading...</div>
   }
 
-  console.log("post-------->", post)
   return (
     <PostForm
       handleDelete={handleDelete}
+      onUpdate={handleUpdate}
       post={post}
       isEdit={true}
     />
