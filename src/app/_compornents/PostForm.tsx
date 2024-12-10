@@ -44,34 +44,32 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
       if (post) {
         // カテゴリーのオブジェクトを取得
         const categoryLists = post.postCategories.map((c) => c.category);
-        console.log("カテゴリーのリスト", categoryLists);
 
         // カテゴリー名のリストをカテゴリーの初期値に設定
-        const categoryNames = categoryLists.filter((c) => c).map((c) => c.name);
+        const categoryNames = categoryLists.map((c) => c.name);
         setValue("categories", categoryNames);
-        setCategoryName(categoryNames);
-        console.log("初期値のカテゴリー", categoryNames);
+        // setCategoryName(categoryNames);
+        // console.log("初期値のカテゴリー", categoryNames);
       }
     };
 
     fetchCategory();
-  }, [post]);
+  }, [post, setValue]);
 
   // 記事投稿
-  const onsubmit: SubmitHandler<PostUpdateData> = async (data) => {
+  const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const initCategories = categories
     //includesを使用してその名前に一致するカテゴリーのidを取得
-    // @ts-ignore
-    .filter((category) => data.categories.includes(category.name))
+    .filter((c) => data.categories.includes(c.name))
     //フィルタリングしたカテゴリーからidを取り出し、新しいオブジェクトに変換
-    .map((category) => ({ id: category.id }));
-
+    .map((c) => ({id: c.id, name: c.name}));
+    console.log("フィルター", initCategories)
     const updateData = {
       ...data,
       categories: initCategories
     };
 
-    console.log("更新する記事のカテゴリー", categoryName);
+    console.log("更新する記事のカテゴリー", updateData);
 
     if (post?.id) {
       console.log("フォームのカテゴリー", updateData);
