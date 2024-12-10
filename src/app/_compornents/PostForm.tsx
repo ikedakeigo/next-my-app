@@ -14,6 +14,13 @@ type PostFormProps = {
   isEdit?: boolean;
 };
 
+type FormValues = {
+  categories: string[];
+  title: string;
+  content: string;
+  thumbnailUrl: string;
+}
+
 const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, post, isEdit }) => {
   // カテゴリーの初期値
   const [categories, setCategories] = useState<RequestCategoryBody[]>([]);
@@ -22,16 +29,9 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
     register, // 入力フィールドを登録する
     handleSubmit, // フォーム送信時の処理を定義する
     setValue, // 入力フォームの初期値
-  } = useForm<PostUpdateData>({
-    defaultValues: {
-      categories: post?.postCategories.map((c) => c.category.name) || [],
-    },
-  });
+  } = useForm<FormValues>();
 
   const router = useRouter();
-
-  // 選択されたカテゴリー
-  const [categoryName, setCategoryName] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCategory = async () => {
