@@ -37,19 +37,18 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
     const fetchCategory = async () => {
       // 全カテゴリーを取得
       const allCategories = await fetch("/api/admin/categories");
-
+      // fetchしたデータをjsonとして受け取る
       const categoryData = await allCategories.json();
-
+      // 受け取ったオブジェクトのcategoriesをuseStateに渡す
       setCategories(categoryData.categories);
+
       if (post) {
         // カテゴリーのオブジェクトを取得
         const categoryLists = post.postCategories.map((c) => c.category);
-
-        // カテゴリー名のリストをカテゴリーの初期値に設定
+        // カテゴリー名を取得
         const categoryNames = categoryLists.map((c) => c.name);
+        // 取得したカテゴリー名をsetValueに設定
         setValue("categories", categoryNames);
-        // setCategoryName(categoryNames);
-        // console.log("初期値のカテゴリー", categoryNames);
       }
     };
 
@@ -59,20 +58,16 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
   // 記事投稿
   const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const initCategories = categories
-    //includesを使用してその名前に一致するカテゴリーのidを取得
+    //includesを使用してフォームで入力したカテゴリーの名前を取得
     .filter((c) => data.categories.includes(c.name))
-    //フィルタリングしたカテゴリーからidを取り出し、新しいオブジェクトに変換
-    .map((c) => ({id: c.id, name: c.name}));
-    console.log("フィルター", initCategories)
+    //フィルタリングしたカテゴリーからidと名前を取り出し、新しいオブジェクトに変換
+    // .map((c) => ({id: c.id, name: c.name}));
     const updateData = {
       ...data,
       categories: initCategories
     };
 
-    console.log("更新する記事のカテゴリー", updateData);
-
     if (post?.id) {
-      console.log("フォームのカテゴリー", updateData);
       onUpdate?.(updateData);
     } else {
       onCreate?.(updateData);
