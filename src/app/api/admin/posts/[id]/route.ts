@@ -1,3 +1,4 @@
+import { supabase } from "@/utils/supabase";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -5,6 +6,17 @@ const prisma = new PrismaClient();
 
 // 記事詳細取得API
 export const GET = async (request: NextRequest, { params }: { params: { id: string } }) => {
+
+  // リクエストのheaderからtokenを取得する
+  const token = request.headers.get("Authorization") ?? "";
+
+  //取得したtokenをsupabaseに送り、errorが返ってきたら
+  const {error} = await supabase.auth.getUser(token)
+
+  // statusを400とmessageを返却する
+  if(error)
+    return NextResponse.json({status: error.message}, {status: 400})
+
   const { id } = params;
 
   try {
