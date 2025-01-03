@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
 import { supabase } from "@/utils/supabase";
 import Link from "next/link";
 import { useSupabaseSession } from "../_hook/useSupabaseSession";
-// import styles from "./Header.module.css";
 const Header: React.FC = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -36,6 +35,11 @@ const Header: React.FC = () => {
               <Link href="/login" className="header-link">
                 ログイン
               </Link>
+              {!session && (
+                <Link href="/signup" className="header-link">
+                  新規登録
+                </Link>
+              )}
             </>
           )}
         </div>
