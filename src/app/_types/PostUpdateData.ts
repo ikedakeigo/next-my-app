@@ -1,7 +1,7 @@
 export type PostUpdateData = {
   title: string;
   content: string;
-  thumbnailUrl: string;
+  thumbnailImageKey: string;
   categories: {
     id: number,
     name: string
