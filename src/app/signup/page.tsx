@@ -6,13 +6,13 @@ import { useState } from "react";
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      // メール認証のリダイレクト先を指定
       options: {
         emailRedirectTo: `http://localhost:3000/login`,
       },
