@@ -37,6 +37,9 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
 
   const router = useRouter();
 
+  // 状態変数と更新関数の定義
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<null | string>(null);
+
   useEffect(() => {
     const fetchCategory = async () => {
       // 全カテゴリーを取得
