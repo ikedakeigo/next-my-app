@@ -74,6 +74,58 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
     }
   };
 
+  // 画像投稿
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    if (!event.target.files || event.target.files.length == 0) {
+      // 画像が選択されていなかった場合return
+      return;
+    }
+
+    const file = event.target.files[0]; //選択された画像を取得
+
+    const filePath = `private/${uuidv4()}`;
+
+    // Supabaseに画像をアップロード
+    // supabase.storage.from('post_thumbnail').uploadというメソッドで、画像をアップロードできます。
+    const { data, error } = await supabase.storage
+      .from("post_thumbnail") // バケットの指定
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    // アップロードに失敗したらエラーを表示して終了
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    // data.pathに画像固有のkeyが入っているので、thumbnailImageKeyに格納する
+    setThumbnailImageKey(data.path);
+  };
+
+  // DBに保存しているthumbnailImageKeyを元に、Supabaseから画像のURLを取得
+  useEffect(() => {
+    if (!thumbnailImageKey) return;
+
+    // Supabaseから画像のURLを取得する関数
+    const fetcher = async () => {
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        // バケット名を指定して、画像のURLを取得
+        .from("post_thumbnail")
+        // 画像のkeyを指定
+        .getPublicUrl(thumbnailImageKey);
+
+      setThumbnailImageUrl(publicUrl);
+    };
+
+    console.log("画像のキー", thumbnailImageKey);
+
+    fetcher();
+  }, [thumbnailImageKey]);
+
   return (
     <div className="p-10 w-full">
       <h2 className="text-xl font-bold mb-6">{isEdit ? "記事編集" : "記事作成"}</h2>
@@ -93,10 +145,17 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
         </div>
 
         <div className="flex flex-col">
-          <label htmlFor="thumbnailUrl" className="mb-2 text-sm font-medium text-gray-700">
+          <label htmlFor="thumbnailImageKey" className="mb-2 text-sm font-medium text-gray-700">
             サムネイルURL
           </label>
-          <input type="text" id="thumbnailUrl" defaultValue={post?.thumbnailUrl} {...register("thumbnailUrl")} className="border text-blue-500 border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="file" id="thumbnailImageKey" onChange={handleImageChange} accept="image/*" />
+
+          {thumbnailImageUrl && (
+            <div className="mt-2">
+              <Image src={thumbnailImageUrl} alt="thumbnail" width={400} height={400} />
+            </div>
+          )}
+          
         </div>
 
         <div className="flex flex-col">
@@ -144,7 +203,6 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
           </button>
         </div>
       </form>
-
     </div>
   );
 };
