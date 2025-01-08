@@ -15,6 +15,8 @@ type PostFormProps = {
   onCreate?: (data: PostUpdateData) => void;
   post?: RequestPostBody;
   isEdit?: boolean;
+  thumbnailImageKey: string;
+  setThumbnailImageKey: (thumbnailImageKey: string) => void;
 };
 
 type FormValues = {
@@ -22,12 +24,11 @@ type FormValues = {
   title: string;
   content: string;
   thumbnailUrl: string;
-}
+};
 
-const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, post, isEdit }) => {
+const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, post, isEdit, thumbnailImageKey, setThumbnailImageKey }) => {
   // カテゴリーの初期値
   const [categories, setCategories] = useState<RequestCategoryBody[]>([]);
-
   const {
     register, // 入力フィールドを登録する
     handleSubmit, // フォーム送信時の処理を定義する
@@ -61,14 +62,16 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
   // 記事投稿
   const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const initCategories = categories
-    //includesを使用してフォームで入力したカテゴリーの名前を取得
-    .filter((c) => data.categories.includes(c.name))
+      //includesを使用してフォームで入力したカテゴリーの名前を取得
+      .filter((c) => data.categories.includes(c.name));
     //フィルタリングしたカテゴリーからidと名前を取り出し、新しいオブジェクトに変換
     // .map((c) => ({id: c.id, name: c.name}));
     const updateData = {
       ...data,
-      categories: initCategories
+      categories: initCategories,
+      thumbnailImageKey, // 状態変数から取得
     };
+    console.log("updateData", updateData);
 
     if (post?.id) {
       onUpdate?.(updateData);
