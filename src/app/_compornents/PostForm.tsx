@@ -1,10 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { RequestPostBody } from "../_types/RequestPostBody";
 import { RequestCategoryBody } from "../_types/RequestCategoryBody";
 import { PostUpdateData } from "../_types/PostUpdateData";
+import { v4 as uuidv4 } from "uuid"; // 固有IDを生成するライブラリ
+import { supabase } from "@/utils/supabase";
+import Image from "next/image";
 
 type PostFormProps = {
   handleDelete?: () => void;
