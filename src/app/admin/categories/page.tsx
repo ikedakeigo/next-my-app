@@ -31,7 +31,7 @@ const CategoryList = () => {
       }
     };
     allCategory();
-  }, []);
+  }, [token]);
 
   if (loading) {
     return <div>Loading...</div>;

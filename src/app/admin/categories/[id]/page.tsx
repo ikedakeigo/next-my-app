@@ -43,7 +43,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({ params }) => {
       }
     };
     fetchCategory();
-  }, [id]);
+  }, [id, token]);
 
   // カテゴリーの削除
   const handleDelete = async () => {
