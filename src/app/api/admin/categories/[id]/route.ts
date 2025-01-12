@@ -1,3 +1,4 @@
+import { supabase } from "@/utils/supabase";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,6 +14,11 @@ export const GET = async (
   }
 ) => {
   const { id } = params;
+
+  // token検証
+  const token = request.headers.get("Authorization") ?? "";
+  const { error } = await supabase.auth.getUser(token);
+  if ( error) return NextResponse.json({status: error.message}, {status: 400});
 
   try {
     const category = await prisma.category.findUnique({
@@ -40,9 +46,13 @@ export const GET = async (
 // カテゴリー更新API
 export const PUT = async (request: NextRequest, { params }: { params: { id: string } }) => {
   const { id } = params;
-
+  const token = request.headers.get("Authorization") ?? "";
   // オブジェクトで受け取る
   const { name } = await request.json();
+
+  const { error } = await supabase.auth.getUser(token);
+  // 送ったtokenが正しくない場合、errorが返却されるのでクライアントにもエラーを返す。
+  if (error) return NextResponse.json({ status: error.message }, { status: 400 });
 
   try {
     const category = await prisma.category.update({

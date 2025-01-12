@@ -1,10 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { RequestPostBody } from "../_types/RequestPostBody";
 import { RequestCategoryBody } from "../_types/RequestCategoryBody";
 import { PostUpdateData } from "../_types/PostUpdateData";
+import { v4 as uuidv4 } from "uuid"; // 固有IDを生成するライブラリ
+import { supabase } from "@/utils/supabase";
+import Image from "next/image";
 
 type PostFormProps = {
   handleDelete?: () => void;
@@ -12,6 +15,8 @@ type PostFormProps = {
   onCreate?: (data: PostUpdateData) => void;
   post?: RequestPostBody;
   isEdit?: boolean;
+  thumbnailImageKey: string;
+  setThumbnailImageKey: (thumbnailImageKey: string) => void;
 };
 
 type FormValues = {
@@ -19,12 +24,11 @@ type FormValues = {
   title: string;
   content: string;
   thumbnailUrl: string;
-}
+};
 
-const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, post, isEdit }) => {
+const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, post, isEdit, thumbnailImageKey, setThumbnailImageKey }) => {
   // カテゴリーの初期値
   const [categories, setCategories] = useState<RequestCategoryBody[]>([]);
-
   const {
     register, // 入力フィールドを登録する
     handleSubmit, // フォーム送信時の処理を定義する
@@ -32,6 +36,9 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
   } = useForm<FormValues>();
 
   const router = useRouter();
+
+  // 状態変数と更新関数の定義
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<null | string>(null);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -58,14 +65,16 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
   // 記事投稿
   const onsubmit: SubmitHandler<FormValues> = async (data) => {
     const initCategories = categories
-    //includesを使用してフォームで入力したカテゴリーの名前を取得
-    .filter((c) => data.categories.includes(c.name))
+      //includesを使用してフォームで入力したカテゴリーの名前を取得
+      .filter((c) => data.categories.includes(c.name));
     //フィルタリングしたカテゴリーからidと名前を取り出し、新しいオブジェクトに変換
     // .map((c) => ({id: c.id, name: c.name}));
     const updateData = {
       ...data,
-      categories: initCategories
+      categories: initCategories,
+      thumbnailImageKey, // 状態変数から取得
     };
+    console.log("updateData", updateData);
 
     if (post?.id) {
       onUpdate?.(updateData);
@@ -73,6 +82,58 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
       onCreate?.(updateData);
     }
   };
+
+  // 画像投稿
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    if (!event.target.files || event.target.files.length == 0) {
+      // 画像が選択されていなかった場合return
+      return;
+    }
+
+    const file = event.target.files[0]; //選択された画像を取得
+
+    const filePath = `private/${uuidv4()}`;
+
+    // Supabaseに画像をアップロード
+    // supabase.storage.from('post_thumbnail').uploadというメソッドで、画像をアップロードできます。
+    const { data, error } = await supabase.storage
+      .from("post_thumbnail") // バケットの指定
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    // アップロードに失敗したらエラーを表示して終了
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    // data.pathに画像固有のkeyが入っているので、thumbnailImageKeyに格納する
+    setThumbnailImageKey(data.path);
+  };
+
+  // DBに保存しているthumbnailImageKeyを元に、Supabaseから画像のURLを取得
+  useEffect(() => {
+    if (!thumbnailImageKey) return;
+
+    // Supabaseから画像のURLを取得する関数
+    const fetcher = async () => {
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        // バケット名を指定して、画像のURLを取得
+        .from("post_thumbnail")
+        // 画像のkeyを指定
+        .getPublicUrl(thumbnailImageKey);
+
+      setThumbnailImageUrl(publicUrl);
+    };
+
+    console.log("画像のキー", thumbnailImageKey);
+
+    fetcher();
+  }, [thumbnailImageKey]);
 
   return (
     <div className="p-10 w-full">
@@ -93,10 +154,17 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
         </div>
 
         <div className="flex flex-col">
-          <label htmlFor="thumbnailUrl" className="mb-2 text-sm font-medium text-gray-700">
+          <label htmlFor="thumbnailImageKey" className="mb-2 text-sm font-medium text-gray-700">
             サムネイルURL
           </label>
-          <input type="text" id="thumbnailUrl" defaultValue={post?.thumbnailUrl} {...register("thumbnailUrl")} className="border text-blue-500 border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="file" id="thumbnailImageKey" onChange={handleImageChange} accept="image/*" />
+
+          {thumbnailImageUrl && (
+            <div className="mt-2">
+              <Image src={thumbnailImageUrl} alt="thumbnail" width={400} height={400} />
+            </div>
+          )}
+          
         </div>
 
         <div className="flex flex-col">
@@ -144,7 +212,6 @@ const PostForm: React.FC<PostFormProps> = ({ handleDelete, onUpdate, onCreate, p
           </button>
         </div>
       </form>
-
     </div>
   );
 };

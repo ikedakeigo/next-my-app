@@ -1,37 +1,48 @@
 "use client";
+import { useSupabaseSession } from "@/app/_hook/useSupabaseSession";
 import { PostListBody } from "@/app/_types/PostListBody";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const PostList = () => {
   const [posts, setPosts] = useState<PostListBody[]>([]);
-  const [loading, setLoding] = useState(true)
-
+  const [loading, setLoding] = useState(true);
+  const { token } = useSupabaseSession();
+  
   useEffect(() => {
+    if (!token) return;
     const allPost = async () => {
       // 取得開始
-      setLoding(true)
+      setLoding(true);
 
       try {
         // 記事一覧apiを取得
-        const res = await fetch("/api/admin/posts");
-        // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/posts`);
+        // fetchメソッドには第二引数のオプションをつけることができる
+        // headersにAuthorizationというキー名でtokenを持たせる
+        const res = await fetch("/api/admin/posts", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token, // Header に token を付与
+          },
+        });
+
         const data = await res.json();
         setPosts(data.posts);
       } catch (error) {
         console.log("データ取得エラー:", error);
       } finally {
         // データの取得が完了したらローディング終了
-        setLoding(false)
+        setLoding(false);
       }
     };
     allPost();
-  }, []);
 
-  const changeDateFormat = (data: string) => new Date(data).toLocaleDateString('ja-JP')
+  }, [token]); // useSupabaseSessionからtokeをうけった際に発火させる
+
+  const changeDateFormat = (data: string) => new Date(data).toLocaleDateString("ja-JP");
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -51,9 +62,7 @@ const PostList = () => {
             return (
               <li className="py-4 border-b-2" key={post.id}>
                 <Link href={`/admin/posts/${post.id}`}>{post.title}</Link>
-                <p className="text-gray-400">
-                {changeDateFormat(post.createdAt)}
-                </p>
+                <p className="text-gray-400">{changeDateFormat(post.createdAt)}</p>
               </li>
             );
           })}

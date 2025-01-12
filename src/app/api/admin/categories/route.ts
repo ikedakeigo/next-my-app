@@ -1,10 +1,25 @@
+import { supabase } from "@/utils/supabase";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export const GET = async (request: NextRequest) => {
+  // リクエストヘッダーからtokeを取得
+  // tokenがない場合は空文字を代入
+  const token = request.headers.get("Authorization") ?? "";
+
+  console.log("token-------->", token);
+  console.log("真偽？", token ? true : false)
+  // supabaseに対してtokenを送る
+  const { error } = await supabase.auth.getUser(token);
+
+  // 送ったtokenが正しくない場合、errorが返却されるのでクライアントにもエラーを返す。
+  if (error) return NextResponse.json({ status: error.message }, { status: 400 });
+
   try {
+
+
     // カテゴリーの一覧をDBから取得
     const categories = await prisma.category.findMany({
       select: {
@@ -45,6 +60,11 @@ interface CreatePostRequestBody {
 }
 
 export const POST = async (request: Request) => {
+  const token = request.headers.get("Authorization") ?? "";
+
+  const { error } = await supabase.auth.getUser(token);
+
+  if (error) return NextResponse.json({ status: error.message }, { status: 400 });
   try {
     // リクエストのbodyを取得
     const body = await request.json();

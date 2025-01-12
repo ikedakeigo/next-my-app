@@ -8,5 +8,5 @@ export type PostListBody = {
   postCategories: {
     category: RequestCategoryBody;
   }[];
-  thumbnailUrl: string;
+  thumbnailImageKey: string;
 };
